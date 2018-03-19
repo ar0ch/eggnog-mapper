@@ -4,7 +4,7 @@ import os
 
 def run(cmd):
     cmd = './emapper.py ' + cmd
-    print cmd
+    print(  cmd )
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out, err = process.communicate()
     if not out:

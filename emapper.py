@@ -55,18 +55,18 @@ def setup_hmm_search(args):
     # If searching against a predefined database name
     if args.db in EGGNOG_DATABASES:
         dbpath, port = get_db_info(args.db)
-        print dbpath
+        print( dbpath )
         db_present = [pexists(dbpath + "." + ext)
                       for ext in 'h3f h3i h3m h3p idmap'.split()]
 
         if False in db_present:
-            print db_present
-            print colorify('Database %s not present. Use download_eggnog_database.py to fetch it' % (args.db), 'red')
+            print( db_present )
+            print( colorify('Database %s not present. Use download_eggnog_database.py to fetch it' % (args.db), 'red') )
             raise ValueError('Database not found')
 
         if not args.no_refine:
             if not pexists(pjoin(get_data_path(), 'OG_fasta')):
-                print colorify('Database data/OG_fasta/ not present. Use download_eggnog_database.py to fetch it', 'red')
+                print( colorify('Database data/OG_fasta/ not present. Use download_eggnog_database.py to fetch it', 'red') )
                 raise ValueError('Database not found')
 
         if scantype == 'mem':
@@ -81,7 +81,7 @@ def setup_hmm_search(args):
             if not pexists(idmap_file):
                 if generate_idmap(args.db):
                     idmap_file = args.db + ".idmap"
-                    print >>sys.stderr, "idmap succesfully created!"
+                    print( >>sys.stderr, "idmap succesfully created!" )
                 else:
                     raise ValueError("idmap could not be created!")
             port = 53000
@@ -107,7 +107,7 @@ def setup_hmm_search(args):
 
         dbpath = host
         if not server_functional(host, port, args.dbtype):
-            print colorify("eggnog-mapper server not found at %s:%s" % (host, port), 'red')
+            print( colorify("eggnog-mapper server not found at %s:%s" % (host, port), 'red') )
             exit(1)
         connecting_to_server = True
     else:
@@ -118,14 +118,14 @@ def setup_hmm_search(args):
     if scantype == "mem" and not connecting_to_server:
         master_db, worker_db = None, None
         for try_port in range(port, end_port, 2):
-            print colorify("Loading server at localhost, port %s-%s" %
+            print( colorify("Loading server at localhost, port %s-%s" % )
                            (try_port, try_port + 1), 'lblue')
             dbpath, master_db, worker_db = load_server(
                 dbpath, try_port, try_port + 1, args.cpu)
             port = try_port
             ready = False
             for _ in xrange(TIMEOUT_LOAD_SERVER):
-                print "Waiting for server to become ready...", host, try_port
+                print( "Waiting for server to become ready...", host, try_port )
                 time.sleep(1)
                 if not master_db.is_alive() or not worker_db.is_alive():
                     master_db.terminate()
@@ -140,12 +140,12 @@ def setup_hmm_search(args):
                 dbpath = host
                 break
     elif scantype == "mem":
-        print colorify("DB Server already running or not needed!", 'yellow')
+        print( colorify("DB Server already running or not needed!", 'yellow') )
         dbpath = host
 
     # Preload seqid map to translate hits from hmmpgmd
     if scantype == "mem":
-        print colorify("Reading idmap %s" % idmap_file, color='lblue')
+        print( colorify("Reading idmap %s" % idmap_file, color='lblue') )
         idmap = {}
         for _lnum, _line in enumerate(open(idmap_file)):
             if not _line.strip():
@@ -160,13 +160,13 @@ def setup_hmm_search(args):
                     raise
             _seqid = int(_seqid)
             idmap[_seqid] = [_seqname]
-        print len(idmap), "names loaded"
+        print( len(idmap), "names loaded" )
 
     # If server mode, just listen for connections and exit when interrupted
     if args.servermode:
         while True:
-            print colorify("Server ready listening at %s:%s and using %d CPU cores" % (host, port, args.cpu), 'green')
-            print colorify("Use `emapper.py -d %s:%s:%s (...)` to search against this server" % (args.db, host, port), 'lblue')
+            print( colorify("Server ready listening at %s:%s and using %d CPU cores" % (host, port, args.cpu), 'green') )
+            print( colorify("Use `emapper.py -d %s:%s:%s (...)` to search against this server" % (args.db, host, port), 'lblue') )
             time.sleep(10)
         raise emapperException()
     else:
@@ -189,22 +189,22 @@ def main(args):
     os.chdir(args.output_dir)
     files_present = set([pexists(fname) for fname in output_files])
     if True in files_present and not args.resume and not args.override:
-        print "Output files detected in disk. Use --resume or --override to continue"
+        print( "Output files detected in disk. Use --resume or --override to continue" )
         raise emapperException()
 
     if args.override:
         for outf in output_files:
             silent_rm(outf)
 
-    print '# ', get_version()
-    print '# ./emapper.py ', ' '.join(sys.argv[1:])
+    print( '# ', get_version() )
+    print( '# ./emapper.py ', ' '.join(sys.argv[1:]) )
 
     if args.scratch_dir:
         # If resuming in and using --scratch_dir, transfer existing files.
         if args.resume and args.scratch_dir:
             for f in output_files:
                 if pexists(f):
-                    print "   Copying input file %s to scratch dir %s" % (f, args.scratch_dir)
+                    print( "   Copying input file %s to scratch dir %s" % (f, args.scratch_dir) )
                     shutil.copy(f, args.scratch_dir)
 
         # Change working dir
@@ -223,11 +223,11 @@ def main(args):
 
             if not args.no_refine and (not pexists(seed_orthologs_file) or args.override):
                 if args.db == 'viruses':
-                    print 'Skipping seed ortholog detection in "viruses" database'
+                    print( 'Skipping seed ortholog detection in "viruses" database' )
                 elif args.db in EGGNOG_DATABASES:
                     refine_matches(args.input, seed_orthologs_file, hmm_hits_file, args)
                 else:
-                    print 'refined hits not available for custom hmm databases.'
+                    print( 'refined hits not available for custom hmm databases.' )
 
     # Step 2. Annotation
     if not args.no_annot:
@@ -244,7 +244,7 @@ def main(args):
                  hmmfrom, hmmto, seqfrom, seqto, q_coverage, nm, desc, cats) = line.split("\t")
 
                 if hitname != '-' and hitname != 'ERROR':
-                    print >>OUT, '\t'.join(map(str, (query,
+                    print( >>OUT, '\t'.join(map(str, (query, )
                                                      hitname,
                                                      evalue,
                                                      sum_score,
@@ -264,23 +264,23 @@ def main(args):
     if args.scratch_dir:
         for fname in output_files:
             if pexists(fname):
-                print " Copying result file %s from scratch to %s" % (fname, args.output_dir)
+                print( " Copying result file %s from scratch to %s" % (fname, args.output_dir) )
                 shutil.copy(annot_file, args.output_dir)
-                print "  Cleaning result file %s from scratch dir" %(fname)
+                print( "  Cleaning result file %s from scratch dir" %(fname) )
 
     # Finalize and exit
-    print colorify('Done', 'green')
+    print( colorify('Done', 'green') )
     for f in output_files:
         colorify('Result files:', 'yellow')
         if pexists(f):
-            print "   %s" % (f)
+            print( "   %s" % (f) )
 
-    print 'Total time: %g secs' % (time.time()-_total_time)
+    print( 'Total time: %g secs' % (time.time()-_total_time) )
 
     if args.mode == 'hmmer':
-        print get_citation(['hmmer'])
+        print( get_citation(['hmmer']) )
     elif args.mode == 'diamond':
-        print get_citation(['diamond'])
+        print( get_citation(['diamond']) )
 
     shutdown_server()
 
@@ -316,15 +316,15 @@ def dump_diamond_matches(fasta_file, seed_orthologs_file, args):
           (DIAMOND, tool, dmnd_db, fasta_file, cpu, evalue_thr, raw_output_file)
     #diamond blastp --threads "${GALAXY_SLOTS:-12}" --db ./database --query '/panfs/roc/galaxy/GALAXYP/files/000/164/dataset_164640.dat' --query-gencode '1'  --outfmt '6' qseqid sseqid sallseqid qlen slen pident length nident mismatch positive gapopen gaps ppos qstart qend sstart send qseq sseq evalue bitscore score qframe stitle salltitles qcovhsp --out '/panfs/roc/galaxy/GALAXYP/files/000/164/dataset_164759.dat'  --compress '0'   --gapopen '10' --gapextend '1' --matrix 'PAM30' --seg 'yes'  --max-target-seqs '25'  --evalue '0.001'  --id '0' --query-cover '0' --block-size '2.0'
 
-    print colorify('  '+cmd, 'yellow')
+    print( colorify('  '+cmd, 'yellow') )
     
     try:
 	subprocess.check_call(cmd, shell=True,stdout=subprocess.PIPE)
         OUT = open('%s' %seed_orthologs_file, 'w')
 
         if not args.no_file_comments:
-            print >>OUT, get_call_info()
-            print >>OUT, '#', cmd
+            print( >>OUT, get_call_info() )
+            print( >>OUT, '#', cmd )
 
         visited = set()
         for line in open(raw_output_file):
@@ -346,7 +346,7 @@ def dump_diamond_matches(fasta_file, seed_orthologs_file, args):
                 continue
 
             visited.add(query)
-            print >>OUT, '\t'.join(map(str, [query, hit, evalue, score]))
+            print( >>OUT, '\t'.join(map(str, [query, hit, evalue, score])) )
         OUT.close()
 
     except subprocess.CalledProcessError as e:
@@ -362,18 +362,18 @@ def dump_hmm_matches(fasta_file, hits_file, dbpath, port, scantype, idmap, args)
     # Cache previous results if resuming is enabled
     VISITED = set()
     if args.resume and pexists(hits_file):
-        print colorify("Resuming previous run. Reading computed output from %s" % hits_file, 'yellow')
+        print( colorify("Resuming previous run. Reading computed output from %s" % hits_file, 'yellow') )
         VISITED = set([line.split('\t')[0].strip()
                        for line in open(hits_file) if not line.startswith('#')])
-        print len(VISITED), 'queries skipped'
+        print( len(VISITED), 'queries skipped' )
         OUT = open(hits_file, 'a')
     else:
         OUT = open(hits_file, 'w')
 
-    print colorify("Sequence mapping starts now!", 'green')
+    print( colorify("Sequence mapping starts now!", 'green') )
     if not args.no_file_comments:
-        print >>OUT, get_call_info()
-        print >>OUT, '# ' + '\t'.join(hits_header)
+        print( >>OUT, get_call_info() )
+        print( >>OUT, '# ' + '\t'.join(hits_header) )
     total_time = 0
     last_time = time.time()
     start_time = time.time()
@@ -398,17 +398,17 @@ def dump_hmm_matches(fasta_file, hits_file, dbpath, port, scantype, idmap, args)
 
         if elapsed == -1:
             # error occurred
-            print >>OUT, '\t'.join(
+            print( >>OUT, '\t'.join( )
                 [name] + ['ERROR'] * (len(hits_header) - 1))
         elif not hits:
-            print >>OUT, '\t'.join([name] + ['-'] * (len(hits_header) - 1))
+            print( >>OUT, '\t'.join([name] + ['-'] * (len(hits_header) - 1)) )
         else:
             for hitindex, (hid, heval, hscore, hmmfrom, hmmto, sqfrom, sqto, domscore) in enumerate(hits):
                 hitname = hid
                 if idmap:
                     hitname = idmap[hid][0]
 
-                print >>OUT, '\t'.join(map(str, [name, hitname, heval, hscore,
+                print( >>OUT, '\t'.join(map(str, [name, hitname, heval, hscore, )
                                                  int(querylen), int(hmmfrom),
                                                  int(hmmto), int(sqfrom),
                                                  int(sqto),
@@ -419,18 +419,18 @@ def dump_hmm_matches(fasta_file, hits_file, dbpath, port, scantype, idmap, args)
         total_time += time.time() - last_time
         last_time = time.time()
         if qn and (qn % 25 == 0):
-            print >>sys.stderr, qn + \
+            print( >>sys.stderr, qn + \ )
                 1, total_time, "%0.2f q/s" % ((float(qn + 1) / total_time))
             sys.stderr.flush()
 
     # Writes final stats
     elapsed_time = time.time() - start_time
     if not args.no_file_comments:
-        print >>OUT, '# %d queries scanned' % (qn + 1)
-        print >>OUT, '# Total time (seconds):', elapsed_time
-        print >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn + 1) / elapsed_time))
+        print( >>OUT, '# %d queries scanned' % (qn + 1) )
+        print( >>OUT, '# Total time (seconds):', elapsed_time )
+        print( >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn + 1) / elapsed_time)) )
     OUT.close()
-    print colorify(" Processed queries:%s total_time:%s rate:%s" %\
+    print( colorify(" Processed queries:%s total_time:%s rate:%s" %\ )
                    (qn+1, elapsed_time, "%0.2f q/s" % ((float(qn+1) / elapsed_time))), 'lblue')
 
 
@@ -440,13 +440,13 @@ def annotate_hmm_matches(hits_file, hits_annot_file, args):
                          members_in_og, og_description, og_COG_categories'''.split(','))
 
     annota.connect()
-    print colorify("Functional annotation of hits starts now", 'green')
+    print( colorify("Functional annotation of hits starts now", 'green') )
     start_time = time.time()
     if pexists(hits_file):
         OUT = open(hits_annot_file, "w")
         if not args.no_file_comments:
-            print >>OUT, get_call_info()
-            print >>OUT, '\t'.join(hits_annot_header)
+            print( >>OUT, get_call_info() )
+            print( >>OUT, '\t'.join(hits_annot_header) )
         qn = 0
         t1 = time.time()
         for line in open(hits_file):
@@ -455,7 +455,7 @@ def annotate_hmm_matches(hits_file, hits_annot_file, args):
             qn += 1
             if qn and (qn % 10000 == 0):
                 total_time = time.time() - start_time
-                print >>sys.stderr, qn, total_time, "%0.2f q/s (refinement)" %\
+                print( >>sys.stderr, qn, total_time, "%0.2f q/s (refinement)" %\ )
                     ((float(qn) / total_time))
                 sys.stderr.flush()
 
@@ -464,27 +464,27 @@ def annotate_hmm_matches(hits_file, hits_annot_file, args):
             if hit not in ['ERROR', '-']:
                 hitname = cleanup_og_name(hit)
                 level, nm, desc, cats = annota.get_og_annotations(hitname)
-                print >>OUT, '\t'.join(map( str, [query, hitname, level, evalue,
+                print( >>OUT, '\t'.join(map( str, [query, hitname, level, evalue, )
                                                   sum_score, query_length,
                                                   hmmfrom, hmmto, seqfrom,
                                                   seqto, q_coverage, nm, desc,
                                                   cats]))
             else:
-                print >>OUT, '\t'.join(
+                print( >>OUT, '\t'.join( )
                     [query] + [hit] * (len(hits_annot_header) - 1))
         elapsed_time = time.time() - t1
         if not args.no_file_comments:
-            print >>OUT, '# %d queries scanned' % (qn)
-            print >>OUT, '# Total time (seconds):', elapsed_time
-            print >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn) / elapsed_time))
+            print( >>OUT, '# %d queries scanned' % (qn) )
+            print( >>OUT, '# Total time (seconds):', elapsed_time )
+            print( >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn) / elapsed_time)) )
         OUT.close()
-        print colorify(" Processed queries:%s total_time:%s rate:%s" %\
+        print( colorify(" Processed queries:%s total_time:%s rate:%s" %\ )
                        (qn, elapsed_time, "%0.2f q/s" % ((float(qn) / elapsed_time))), 'lblue')
 
 
 def get_seq_hmm_matches(hits_file):
     annota.connect()
-    print colorify("Reading HMM matches", 'green')
+    print( colorify("Reading HMM matches", 'green') )
     seq2oginfo = {}
     start_time = time.time()
     hitnames = set()
@@ -507,15 +507,15 @@ def refine_matches(fasta_file, refine_file, hits_file, args):
     refine_header = map(str.strip, '''#query_name, best_hit_eggNOG_ortholog,
                         best_hit_evalue, best_hit_score'''.split(','))
 
-    print colorify("Hit refinement starts now", 'green')
+    print( colorify("Hit refinement starts now", 'green') )
     start_time = time.time()
     og2level = dict([tuple(map(str.strip, line.split('\t')))
                      for line in gopen(get_oglevels_file())])
     OUT = open(refine_file, "w")
 
     if not args.no_file_comments:
-        print >>OUT, get_call_info()
-        print >>OUT, '\t'.join(refine_header)
+        print( >>OUT, get_call_info() )
+        print( >>OUT, '\t'.join(refine_header) )
 
     qn = 0 # in case no hits in loop bellow
     for qn, r in enumerate(process_nog_hits_file(hits_file, fasta_file, og2level,
@@ -525,7 +525,7 @@ def refine_matches(fasta_file, refine_file, hits_file, args):
                                                  base_tempdir=args.temp_dir)):
         if qn and (qn % 25 == 0):
             total_time = time.time() - start_time
-            print >>sys.stderr, qn + 1, total_time, "%0.2f q/s (refinement)" % ((float(qn + 1) / total_time))
+            print( >>sys.stderr, qn + 1, total_time, "%0.2f q/s (refinement)" % ((float(qn + 1) / total_time)) )
             sys.stderr.flush()
         query_name = r[0]
         best_hit_name = r[1]
@@ -533,17 +533,17 @@ def refine_matches(fasta_file, refine_file, hits_file, args):
             continue
         best_hit_evalue = float(r[2])
         best_hit_score = float(r[3])
-        print >>OUT, '\t'.join(map(str, (query_name, best_hit_name,
+        print( >>OUT, '\t'.join(map(str, (query_name, best_hit_name, )
                                          best_hit_evalue, best_hit_score)))
         #OUT.flush()
 
     elapsed_time = time.time() - start_time
     if not args.no_file_comments:
-        print >>OUT, '# %d queries scanned' % (qn + 1)
-        print >>OUT, '# Total time (seconds):', elapsed_time
-        print >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn + 1) / elapsed_time))
+        print( >>OUT, '# %d queries scanned' % (qn + 1) )
+        print( >>OUT, '# Total time (seconds):', elapsed_time )
+        print( >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn + 1) / elapsed_time)) )
     OUT.close()
-    print colorify(" Processed queries:%s total_time:%s rate:%s" %\
+    print( colorify(" Processed queries:%s total_time:%s rate:%s" %\ )
                    (qn+1, elapsed_time, "%0.2f q/s" % ((float(qn+1) / elapsed_time))), 'lblue')
 
 
@@ -677,16 +677,16 @@ def annotate_hits_file(seed_orthologs_file, annot_file, hmm_hits_file, args):
 
     seq2annotOG = annota.get_ogs_annotations(set([v[0] for v in seq2bestOG.itervalues()]))
 
-    print colorify("Functional annotation of refined hits starts now", 'green')
+    print( colorify("Functional annotation of refined hits starts now", 'green') )
     OUT = open(annot_file, "w")
     if args.report_orthologs:
         ORTHOLOGS = open(annot_file+".orthologs", "w")
 
     if not args.no_file_comments:
-        print >>OUT, '# emapper version:', get_version(), 'emapper DB:', get_db_version()
-        print >>OUT, '# command: ./emapper.py ', ' '.join(sys.argv[1:])
-        print >>OUT, '# time: ' + time.ctime()
-        print >>OUT, '\t'.join(annot_header)
+        print( >>OUT, '# emapper version:', get_version(), 'emapper DB:', get_db_version() )
+        print( >>OUT, '# command: ./emapper.py ', ' '.join(sys.argv[1:]) )
+        print( >>OUT, '# time: ' + time.ctime() )
+        print( >>OUT, '\t'.join(annot_header) )
 
     qn = 0
     pool = multiprocessing.Pool(args.cpu)
@@ -694,7 +694,7 @@ def annotate_hits_file(seed_orthologs_file, annot_file, hmm_hits_file, args):
         qn += 1
         if qn and (qn % 500 == 0):
             total_time = time.time() - start_time
-            print >>sys.stderr, qn, total_time, "%0.2f q/s (refinement)" % (
+            print( >>sys.stderr, qn, total_time, "%0.2f q/s (refinement)" % ( )
                 (float(qn) / total_time))
             sys.stderr.flush()
 
@@ -712,9 +712,9 @@ def annotate_hits_file(seed_orthologs_file, annot_file, hmm_hits_file, args):
                 og_cat, og_desc = annota.get_best_og_description(match_nogs)
 
             if args.report_orthologs:
-                print >>ORTHOLOGS, '\t'.join(map(str, (query_name, ','.join(orthologs))))
+                print( >>ORTHOLOGS, '\t'.join(map(str, (query_name, ','.join(orthologs)))) )
 
-            print >>OUT, '\t'.join(map(str, (query_name,
+            print( >>OUT, '\t'.join(map(str, (query_name, )
                                              best_hit_name,
                                              best_hit_evalue,
                                              best_hit_score,
@@ -735,15 +735,15 @@ def annotate_hits_file(seed_orthologs_file, annot_file, hmm_hits_file, args):
 
     elapsed_time = time.time() - start_time
     if not args.no_file_comments:
-        print >>OUT, '# %d queries scanned' % (qn)
-        print >>OUT, '# Total time (seconds):', elapsed_time
-        print >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn) / elapsed_time))
+        print( >>OUT, '# %d queries scanned' % (qn) )
+        print( >>OUT, '# Total time (seconds):', elapsed_time )
+        print( >>OUT, '# Rate:', "%0.2f q/s" % ((float(qn) / elapsed_time)) )
     OUT.close()
 
     if args.report_orthologs:
         ORTHOLOGS.close()
 
-    print colorify(" Processed queries:%s total_time:%s rate:%s" %\
+    print( colorify(" Processed queries:%s total_time:%s rate:%s" %\ )
                    (qn, elapsed_time, "%0.2f q/s" % ((float(qn) / elapsed_time))), 'lblue')
 
 
@@ -751,20 +751,20 @@ def parse_args(parser):
     args = parser.parse_args()
 
     if args.version:
-        print get_version()
+        print( get_version() )
         sys.exit(0)
 
     if args.data_dir:
         set_data_path(args.data_dir)
 
     if not args.no_annot and not pexists(get_eggnogdb_file()):
-        print colorify('Annotation database data/eggnog.db not present. Use download_eggnog_database.py to fetch it', 'red')
+        print( colorify('Annotation database data/eggnog.db not present. Use download_eggnog_database.py to fetch it', 'red') )
         raise emapperException()
 
     if args.mode == 'diamond':
         dmnd_db = args.dmnd_db if args.dmnd_db else get_eggnog_dmnd_db()
         if not pexists(dmnd_db):
-            print colorify('DIAMOND database %s not present. Use download_eggnog_database.py to fetch it' % dmnd_db, 'red')
+            print( colorify('DIAMOND database %s not present. Use download_eggnog_database.py to fetch it' % dmnd_db, 'red') )
             raise emapperException()
 
     if args.cpu == 0:
@@ -817,7 +817,7 @@ def parse_args(parser):
                 lineage = ncbi.get_lineage(args.guessdb)
                 for tid in reversed(lineage):
                     if tid in TAXID2LEVEL:
-                        print tid, TAXID2LEVEL[tid]
+                        print( tid, TAXID2LEVEL[tid] )
                         args.db = TAXID2LEVEL[tid]
                         break
         # DIAMOND

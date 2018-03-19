@@ -18,7 +18,7 @@ parser.add_option("--doconly", dest="doconly", action='store_true')
 
 def _ex(cmd, interrupt=True):
     if options.verbose or options.simulate:
-        print "***", cmd
+        print(  "***", cmd )
     if not options.simulate:
         s = os.system(cmd)
         if s != 0 and interrupt:
@@ -53,7 +53,7 @@ def ask_path(string, default_path):
         if v == '':
             v = default_path
         if not os.path.exists(v):
-            print >>sys.stderr, v, "does not exist."
+            print(  >>sys.stderr, v, "does not exist." )
             v = None
     return v
 
@@ -62,9 +62,9 @@ CURRENT_VERSION = open('VERSION').readline().strip()
 a, b, c, tag, ncom, hcom  = re.search("(\d+)\.(\d+)\.(\d+)(-?\w+\d+)?-?(\d+)?-?(\w+)?", CURRENT_VERSION).groups()
 a, b, c = map(int, (a, b, c))
 SERIES_VERSION = "%s.%s" %(a, b)
-print '===================================================='
-print 'CURRENT VERSION:', a, b, c, tag, ncom, hcom
-print '===================================================='
+print(  '====================================================' )
+print(  'CURRENT VERSION:', a, b, c, tag, ncom, hcom )
+print(  '====================================================' )
 # test examples
 raw_input('continue?')
 
@@ -89,7 +89,7 @@ if not options.doconly:
             _ex('git push')
             _ex('git push --tags')
     else:
-        print 'Aborted'
+        print(  'Aborted' )
         sys.exit(1)
 
 

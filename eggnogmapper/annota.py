@@ -269,13 +269,9 @@ def get_annotated_orthologs(target_members, orthotype, excluded_gos, cpu):
     cmd3 = 'SELECT name, pname, go, kegg FROM member WHERE name in (%s);' % in_clause
     t1 = time.time()
     db.execute(cmd3)
-    print time.time() - t1
-    functions = {e[0]: e[1:] for e in db.fetchall()}
-    print time.time() - t1
-
-    #print len(all_orthologs), list(all_orthologs)[:10], in_clause[:10]
-    #print len([b for a,b in functions.iteritems() if b[0] ])
-    annotations = {}
+    print( time.time() - t1 )    functions = {e[0]: e[1:] for e in db.fetchall()}
+    print( time.time() - t1 )
+    #print( len(all_orthologs), list(all_orthologs)[:10], in_clause[:10] )    #print( len([b for a,b in functions.iteritems() if b[0] ]) )    annotations = {}
     for m, orthologs in m2or.iteritems():
         all_gos = set()
         all_kegg = set()

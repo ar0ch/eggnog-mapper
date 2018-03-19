@@ -225,19 +225,15 @@ def hmmscan(query_file, translate, database_path, cpus=1, evalue_thr=None,
     OUT = NamedTemporaryFile(dir=tempdir)
     if translate or maxseqlen:
         if translate:
-            print 'translating query input file'
-        Q = NamedTemporaryFile()
+            print( 'translating query input file' )        Q = NamedTemporaryFile()
         for name, seq in seqio.iter_fasta_seqs(query_file, translate=translate):
             if maxseqlen is None or len(seq) <= maxseqlen:
-                print >>Q, ">%s\n%s" % (name, seq)
-        Q.flush()
+                print( >>Q, ">%s\n%s" % (name, seq) )        Q.flush()
         query_file = Q.name
 
     cmd = '%s --cpu %s -o /dev/null --domtblout %s %s %s' % (
         HMMSCAN, cpus, OUT.name, database_path, query_file)
-    # print '#', cmd
-    # print cmd
-    sts = subprocess.call(cmd, shell=True)
+    # print( '#', cmd )    # print( cmd )    sts = subprocess.call(cmd, shell=True)
     byquery = defaultdict(list)
 
     last_query = None
@@ -351,8 +347,7 @@ def get_best_hit(target_seq, target_og, excluded_taxa, tempdir):
     cmd = "%s --incE 0.001 -E 0.001 -o /dev/null --noali --tblout %s %s %s" %\
           (PHMMER, tempout, target_seq, target_og)
 
-    # print cmd
-    status = os.system(cmd)
+    # print( cmd )    status = os.system(cmd)
     best_hit_found = False
     if status == 0:
         # take the best hit

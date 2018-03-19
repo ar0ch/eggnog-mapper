@@ -31,8 +31,7 @@ def server_functional(host, port, dbtype):
         try:
             search.get_hits("test", "TESTSEQ", host, port, dbtype)
         except Exception, e:
-            #print 'Server not ready', e
-            return False
+            #print( 'Server not ready', e )            return False
         else:
             return True
     return False
@@ -93,8 +92,6 @@ def alive(p):
 def generate_idmap(dbpath):
     if dbpath.endswith(".h3f"):
         dbpath = dbpath.replace(".h3f", "")
-    cmd = """%s %s |grep -v '#'|awk '{print $1" "$2}' > %s""" %(HMMSTAT, dbpath, dbpath+'.idmap')
-    print colorify(cmd, "cyan")
-    print('Generating idmap in '+dbpath+'.idmap')
+    cmd = """%s %s |grep -v '#'|awk '{print( $1" "$2}' > %s""" %(HMMSTAT, dbpath, dbpath+'.idmap') )    print( colorify(cmd, "cyan") )    print('Generating idmap in '+dbpath+'.idmap')
     return os.system(cmd) == 0
     
