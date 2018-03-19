@@ -7,7 +7,7 @@ from eggnogmapper.utils import ask, colorify
 DATABASE_VERSION="4.5.1"
 
 def run(cmd):
-    print colorify(cmd, 'cyan')
+    print( colorify(cmd, 'cyan') )
     if not args.simulate:
         os.system(cmd)
 
@@ -55,7 +55,7 @@ def download_og2level():
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('dbs', metavar='dbs', nargs='+', choices=sorted(EGGNOG_DATABASES.keys()+['all', 'none']),
+    parser.add_argument('dbs', metavar='dbs', nargs='+', choices=sorted(list(EGGNOG_DATABASES.keys())+['all', 'none']),
                         help='list of eggNOG HMM databases to download. Choose "none" if only diamond will be used')
 
     parser.add_argument('-D', action="store_true", dest='skip_diamond',
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         set_data_path(args.data_dir)
 
     if args.force or not pexists(pjoin(get_data_path(), 'og2level.tsv.gz')):
-        print colorify('Downloading "og2level.tsv.gz" at %s' %get_data_path(), 'green')
+        print( colorify('Downloading "og2level.tsv.gz" at %s' %get_data_path(), 'green') )
         download_og2level()
 
     if 'all' in args.dbs:
@@ -91,41 +91,41 @@ if __name__ == "__main__":
 
     if args.force or not pexists(pjoin(get_data_path(), 'eggnog.db')):
         if args.allyes or ask("Download main annotation database?") == 'y':
-            print colorify('Downloading "eggnog.db" at %s...' %get_data_path(), 'green')
+            print( colorify('Downloading "eggnog.db" at %s...' %get_data_path(), 'green') )
             download_annotations()
         else:
-            print 'Skipping'
+            print( 'Skipping' )
 
     else:
         if not args.quiet:
-            print colorify('Skipping eggnog.db database (already present). Use -f to force download', 'lblue')
+            print( colorify('Skipping eggnog.db database (already present). Use -f to force download', 'lblue') )
 
     if args.force or not pexists(pjoin(get_data_path(), 'OG_fasta')):
         if args.allyes or ask("Download OG fasta files for annotation refinement (~20GB after decompression)?") == 'y':
-            print colorify('Downloading fasta files " at %s/OG_fasta...' %get_data_path(), 'green')
+            print( colorify('Downloading fasta files " at %s/OG_fasta...' %get_data_path(), 'green') )
             download_groups()
         else:
-            print 'Skipping'
+            print( 'Skipping' )
 
     else:
         if not args.quiet:
-            print colorify('Skipping OG_fasta/ database (already present). Use -f to force download', 'lblue')
+            print( colorify('Skipping OG_fasta/ database (already present). Use -f to force download', 'lblue') )
 
     if not args.skip_diamond and (args.force or not pexists(pjoin(get_data_path(), 'eggnog_proteins.dmnd'))):
         if args.allyes or ask("Download diamond database (~4GB after decompression)?") == 'y':
-            print colorify('Downloading fasta files " at %s/eggnog_proteins.dmnd...' %get_data_path(), 'green')
+            print( colorify('Downloading fasta files " at %s/eggnog_proteins.dmnd...' %get_data_path(), 'green') )
             download_diamond_db()
         else:
-            print 'Skipping'
+            print( 'Skipping' )
     else:
         if not args.quiet:
-            print colorify('Skipping diamond database (or already present). Use -f to force download', 'lblue')
+            print( colorify('Skipping diamond database (or already present). Use -f to force download', 'lblue') )
 
     if set(args.dbs) != set(['none']):
         if args.allyes or ask("Download %d HMM database(s): %s?"%(len(args.dbs), ','.join(args.dbs))) == 'y':
             for db in args.dbs:
                 if args.force or not get_db_present(db):
-                    print colorify('Downloading %s HMM database " at %s/%s\_hmm ...' %(db, get_hmmdb_path(), db), 'green')
+                    print( colorify('Downloading %s HMM database " at %s/%s\_hmm ...' %(db, get_hmmdb_path(), db), 'green') )
                     download_hmm_database(db)
         else:
-            print 'Skipping'
+            print( 'Skipping' )
